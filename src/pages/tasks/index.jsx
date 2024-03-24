@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState,useRef} from "react";
 import Box from "@mui/material/Box";
 import {stores, users} from '../../utils/consts';
 import Typography from "@mui/material/Typography";
@@ -7,14 +7,15 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import DoneIcon from '@mui/icons-material/Done';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Checkbox from '@mui/material/Checkbox';
+import userImage from '../../assets/users.jpg'
+import imagePicker from '../../assets/Group 172.png'
 
-export default function Tasks({showZone, zonesCount, handleDeleteZone}) {
+export default function Tasks({zonesCount, handleDeleteZone}) {
    const [isHovering, setIsHovering] = useState(Array(zonesCount).fill(false));
    const [zoneModals, setZoneModals] = useState(Array(zonesCount).fill(false));
    const [checkedUsers, setCheckedUsers] = useState([]);
-   
-   console.log(checkedUsers);
    
    const handleMouseEnter = (index) => {
 	  setIsHovering((prevHovering) => {
@@ -40,18 +41,20 @@ export default function Tasks({showZone, zonesCount, handleDeleteZone}) {
 	  });
    };
    
-   // const handleCloseModal = () => {
-   //   setIsModalOpen(false);
-   //   setSelectedZone(null);
-   // };
-   
-   // const handleCheckboxChange = (index) => {
-   //   const newCheckedUsers = [...checkedUsers];
-   //   newCheckedUsers[index] = !newCheckedUsers[index];
-   //   setCheckedUsers(newCheckedUsers);
-   // };
-   
    const Modal = ({index}) => {
+	  const [addUserModal, setAddUserModal] = useState(false);
+	  const [searchTerm, setSearchTerm] = React.useState('');
+	  const [nameSurname, setNameSurname] = useState('');
+	  const [displayedValue, setDisplayedValue] = useState('');
+	  // const inputRef = useRef(null);
+   
+	  // const [selectedImage, setSelectedImage] = useState(null);
+	  // const fileInputRef = useRef(null);
+	  // const [users, setUsers] = useState([]);
+   
+	  const filteredUsers = users.filter(user => {
+		 return user.userName.toLowerCase().includes(searchTerm.toLowerCase());
+	  })
 	  
 	  const handleCheckboxChange = (index, item) => {
 		 const userNew = {...item}
@@ -59,143 +62,332 @@ export default function Tasks({showZone, zonesCount, handleDeleteZone}) {
 		 newCheckedUsers[index] = !newCheckedUsers[index];
 		 newCheckedUsers[index] ? newCheckedUsers[index] = userNew : null
 		 setCheckedUsers(newCheckedUsers);
-		 console.log('new check', Object.values(item));
 	  };
+   
+	  const handleAddUserOpenModal = () => {
+		 setAddUserModal(true);
+	  };
+   
+	  const handleAddUserCloseModal = () => {
+		 setAddUserModal(false);
+	  };
+   
+	  const handleNameSurnameChange = (event) => {
+		 setNameSurname(event.target.value);
+	  };
+   
+	  const handleAddUser = () => {
+		 setDisplayedValue(nameSurname);
+	  };
+   
+	  const handleModalContentClick = (e) => {
+		 e.stopPropagation();
+	  };
+   
+	  // const handleImageChange = (event) => {
+		//  const file = event.target.files[0];
+		//  if (file) {
+		// 	const reader = new FileReader();
+		// 	reader.onload = () => {
+		// 	   setSelectedImage(reader.result);
+		// 	};
+		// 	reader.readAsDataURL(file);
+		//  }
+	  // };
+   
+	  // const handleImageClick = (e) => {
+		//  e.stopPropagation();
+		//  fileInputRef.current.click();
+	  // };
 	  
-	  return (
-		  <Box component='div'>
-			 {zoneModals[index] && (
-				 <Box
-					 component='div'
-					 style={{
-						position: 'absolute',
-						left: 700,
-						top: 200,
-					 }}
-				 >
+	  
+	  const AddUserModal = () => {
+		 // const [nameSurname, setNameSurname] = useState("");
+		 //
+		 // const handleNameSurnameChange = (event) => {
+			// setNameSurname(event.target.value);
+		 // };
+		 //
+		 // const handleAddUser = () => {
+			// onAddUser(nameSurname);
+			// handleAddUserCloseModal();
+		 // };
+		 
+		 return (
+			 <Box
+				 component='div'
+				 onClick={handleAddUserCloseModal}
+				 style={{
+					position: 'fixed',
+					top: 0,
+					left: 0,
+					width: '100%',
+					height: '100%',
+					zIndex: 1000,
+					display: 'flex',
+					justifyContent: 'center',
+					alignItems: 'center',
+					backgroundColor: 'rgba(0, 0, 0, 0.3)',
+				 }}
+			 >
+				{addUserModal && (
 					<Box
 						component='div'
+						onClick={handleModalContentClick}
 						style={{
 						   backgroundColor: '#eaeaea',
-						   height: 600,
-						   width: 700,
+						   height: 280,
+						   width: 343,
 						   borderRadius: 20,
-						   overflow: 'hidden',
-						   position: 'relative',
 						}}
 					>
 					   <Box
 						   component='div'
-						   sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginLeft: 4, marginTop: 3, marginRight: 4, marginBottom: 3}}
-					   >
-						  <Typography variant='body1' style={{fontWeight: 'bold', fontSize: 20, color: '#4C4B5E'}}>
-							 Zone {index + 1}
-						  </Typography>
-						  <IconButton
-							  aria-label="delete"
-						  >
-							 <AddOutlinedIcon sx={{color: "#4C4B5E", fontSize: 30}}/>
-						  </IconButton>
-					   </Box>
-					   <Box sx={{width: 700, height: '1px', backgroundColor: '#ccc'}}/>
-					   <Box
-						   component='div'
-						   sx={{
+						   style={{
 							  display: 'flex',
-							  alignItem: 'center',
-							  justifyContent: 'space-between',
-							  width: 640,
-							  height: 40,
-							  border: '2px solid #ccc',
-							  marginLeft: 3.5,
-							  marginTop: 3,
-							  borderRadius: 1
+							  alignItems: 'center',
+							  paddingTop: 25,
+							  paddingLeft: 25
 						   }}
 					   >
-						  <input
-							  type='text'
-							  placeholder='Search'
-							  style={{
-								 width: 600,
-								 height: 35,
-								 backgroundColor: '#eaeaea',
-								 border: 'none',
-								 outline: 'none',
-								 textIndent: '10px'
-							  }}
-						  />
-						  <SearchOutlinedIcon sx={{color: "#4C4B5E", fontSize: 25, marginTop: 0.7, marginRight: 0.7}}/>
+						  <IconButton
+							  aria-label="back"
+							  onClick={handleAddUserCloseModal}
+						  >
+							 <ArrowBackIcon sx={{color: "#4C4B5E", fontSize: 24}} />
+						  </IconButton>
+						  <Typography variant='body1' style={{fontWeight: 'bold', fontSize: 24, color: '#4C4B5E', marginLeft: 55}}>
+							 Add User
+						  </Typography>
 					   </Box>
 					   <Box
 						   component='div'
 						   sx={{
 							  display: 'flex',
 							  flexDirection: 'column',
-							  alignItems: 'start',
+							  alignItems: 'center',
 							  justifyContent: 'space-between',
-							  marginLeft: 4,
-							  marginTop: 7,
-							  marginRight: 4,
-							  marginBottom: 3,
-							  gap: 3
+							  marginTop: 3,
+							  gap: 2
 						   }}
 					   >
-						  {users.map((item, index) => (
-							  <Box
-								  key={index}
-								  component='div'
-								  sx={{
-									 display: 'flex',
-									 flexDirection: 'row',
-									 alignItems: 'center',
-									 justifyContent: 'center',
-									 gap: 5
-								  }}
-							  >
-								 <Checkbox
-									 id={`checkbox-${index}`}
-									 checked={checkedUsers[index]}
-									 onChange={() => handleCheckboxChange(index, item)}
-								 />
-								 <img src={item.profileImg} height={48} width={48} style={{borderRadius: 99, marginLeft: 12}}/>
-								 <Typography
-									 variant='body1'
-									 style={{
-										fontWeight: 'normal',
-										fontSize: 16,
-										color: '#4C4B5E',
+						  {/*<Box*/}
+							{/*  component='div'*/}
+						  {/*>*/}
+							{/* <img src={userImage} alt="Selected" style={{ maxWidth: '100%' }} />*/}
+							{/* {selectedImage && (*/}
+							{/*	 <img src={selectedImage || userImage} alt="Selected" style={{ maxWidth: '100%' }} onClick={handleImageClick} />*/}
+							{/* )}*/}
+							{/* <input*/}
+							{/*	 type="file"*/}
+							{/*	 accept="image/*"*/}
+							{/*	 onChange={handleImageChange}*/}
+							{/*	 onClick={(e) => e.stopPropagation()}*/}
+							{/*	 style={{ marginTop: '10px' }}*/}
+							{/*	 ref={fileInputRef}*/}
+							{/* />*/}
+						  {/*</Box>*/}
+						  <Box
+							  component='div'
+							  sx={{
+								 display: 'flex',
+								 alignItems: 'center',
+								 gap: 2
+							  }}
+						  >
+							 <img src={imagePicker}  height={48} alt='imagepicker' />
+							 <input
+								 type='text'
+								 placeholder='Name Surname'
+								 value={nameSurname}
+								 onChange={handleNameSurnameChange}
+								 // onClick={handleInputClick}
+								 style={{
+									width: 219,
+									height: 28,
+									backgroundColor: '#eaeaea',
+									border: 'none',
+									borderBottom: '2px solid #ccc',
+									outline: 'none',
+									textIndent: '10px'
+								 }}
+							 />
+						  </Box>
+						  <button
+							  onClick={handleAddUser}
+							  style={{
+								 width: 283,
+								 height: 44,
+								 backgroundColor: '#D12B57',
+								 border: 'none',
+								 color: '#fff',
+								 borderRadius: 4,
+								 marginTop: 60
+							  }}
+						  >
+							 Add User
+						  </button>
+					   </Box>
+					</Box>
+				)}
+			 </Box>
+		 )
+	  }
+	  
+	  return (
+		  <Box component='div'>
+			 {zoneModals[index] && (
+				 <>
+					<Box
+						component='div'
+						style={{
+						   position: 'fixed',
+						   top: 0,
+						   left: 0,
+						   width: '100%',
+						   height: '100%',
+						   backgroundColor: 'rgba(0, 0, 0, 0.3)',
+						   zIndex: 999,
+						}}
+						onClick={() => handleZoneClick(index)}
+					/>
+					<Box
+						component='div'
+						style={{
+						   position: 'absolute',
+						   left: 700,
+						   top: 200,
+						   zIndex: 999,
+						}}
+					>
+					   <Box
+						   component='div'
+						   style={{
+							  backgroundColor: '#eaeaea',
+							  height: 600,
+							  width: 700,
+							  borderRadius: 20,
+							  overflow: 'hidden',
+							  position: 'relative',
+						   }}
+					   >
+						  <Box
+							  component='div'
+							  sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginLeft: 4, marginTop: 3, marginRight: 4, marginBottom: 3}}
+						  >
+							 <Typography variant='body1' style={{fontWeight: 'bold', fontSize: 20, color: '#4C4B5E'}}>
+								Zone {index + 1}
+							 </Typography>
+							 <IconButton
+								 aria-label="add-user"
+								 onClick={() => handleAddUserOpenModal()}
+							 >
+								<AddOutlinedIcon sx={{color: "#4C4B5E", fontSize: 30}}/>
+							 </IconButton>
+						  </Box>
+						  {addUserModal && <AddUserModal onClose={() => setAddUserModal(false)} />}
+						  <Box sx={{width: 700, height: '1px', backgroundColor: '#ccc'}}/>
+						  <Box
+							  component='div'
+							  sx={{
+								 display: 'flex',
+								 alignItem: 'center',
+								 justifyContent: 'space-between',
+								 width: 640,
+								 height: 40,
+								 border: '2px solid #ccc',
+								 marginLeft: 3.5,
+								 marginTop: 3,
+								 borderRadius: 1
+							  }}
+						  >
+							 <input
+								 type='text'
+								 placeholder='Search'
+								 value={searchTerm}
+								 onChange={(e) => setSearchTerm(e.target.value)}
+								 style={{
+									width: 600,
+									height: 35,
+									backgroundColor: '#eaeaea',
+									border: 'none',
+									outline: 'none',
+									textIndent: '10px'
+								 }}
+							 />
+							 <SearchOutlinedIcon sx={{color: "#4C4B5E", fontSize: 25, marginTop: 0.7, marginRight: 0.7}}/>
+						  </Box>
+						  <Box
+							  component='div'
+							  sx={{
+								 display: 'flex',
+								 flexDirection: 'column',
+								 alignItems: 'start',
+								 justifyContent: 'space-between',
+								 marginLeft: 4,
+								 marginTop: 7,
+								 marginRight: 4,
+								 marginBottom: 3,
+								 gap: 3
+							  }}
+						  >
+							 {filteredUsers.map((item, index) => (
+								 <Box
+									 key={index}
+									 component='div'
+									 sx={{
 										display: 'flex',
+										flexDirection: 'row',
 										alignItems: 'center',
 										justifyContent: 'center',
-										gap: 10
+										gap: 5
 									 }}
 								 >
-									{item.userName} {checkedUsers[index] ? <DoneIcon sx={{color: "#0ac75d", fontSize: 30}}/> : ""}
-								 </Typography>
-							  </Box>
-						  ))}
-					   </Box>;
-					   <button
-						   onClick={() => handleZoneClick(index)}
-						   style={{
-							  position: 'absolute',
-							  bottom: 20,
-							  right: 20,
-							  width: 134,
-							  height: 40,
-							  backgroundColor: '#D12B57',
-							  border: 'none',
-							  color: '#fff',
-							  borderRadius: 4,
-						   }}
-					   >
-						  Close
-					   </button>
+									<Checkbox
+										id={`checkbox-${index}`}
+										checked={checkedUsers[index]}
+										onChange={() => handleCheckboxChange(index, item)}
+									/>
+									<img src={item.profileImg} height={48} width={48} style={{borderRadius: 99, marginLeft: 12}}/>
+									<Typography
+										variant='body1'
+										style={{
+										   fontWeight: 'normal',
+										   fontSize: 16,
+										   color: '#4C4B5E',
+										   display: 'flex',
+										   alignItems: 'center',
+										   justifyContent: 'center',
+										   gap: 10
+										}}
+									>
+									   {item.userName} {checkedUsers[index] ? <DoneIcon sx={{color: "#0ac75d", fontSize: 30}}/> : ""}
+									</Typography>
+								 </Box>
+							 ))}
+							 {displayedValue}
+						  </Box>
+						  <button
+							  onClick={() => handleZoneClick(index)}
+							  style={{
+								 position: 'absolute',
+								 bottom: 20,
+								 right: 20,
+								 width: 134,
+								 height: 40,
+								 backgroundColor: '#D12B57',
+								 border: 'none',
+								 color: '#fff',
+								 borderRadius: 4,
+							  }}
+						  >
+							 Close
+						  </button>
+					   </Box>
 					</Box>
-				 </Box>
+				 </>
 			 )}
 		  </Box>
-	  
 	  );
    };
    
@@ -354,7 +546,7 @@ export default function Tasks({showZone, zonesCount, handleDeleteZone}) {
 									   <DeleteIcon sx={{color: "#000", fontSize: 40}}/>
 									</IconButton>
 									<Typography variant="body2" sx={{fontWeight: "normal", fontSize: 30, color: "#000", position: "absolute", top: 160, right: 70}}>
-									   Tap to add users
+									   Tap to Add Users
 									</Typography>
 								 </>
 							 )}

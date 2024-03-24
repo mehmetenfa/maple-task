@@ -9,6 +9,7 @@ export default function Sidebar({ onComponentChange }) {
    const [activeIndex, setActiveIndex] = useState(null);
    const [selectedUser, setSelectedUser] = useState(null);
    const [open, setOpen] = useState(false);
+   const [selectedPage, setSelectedPage] = useState('/tasks');
    
    const handleOpen = () => {
 	  setOpen(true);
@@ -94,7 +95,10 @@ export default function Sidebar({ onComponentChange }) {
 				 >
 					<NavLink to={item.route} style={{ textDecoration: 'none' }}>
 					   <button
-						   onClick={() => handleItemClick(index, item.route)}
+						   onClick={() => {
+							  handleItemClick(index, item.route);
+							  setSelectedPage(item.route);
+						   }}
 						   style={{
 							  display: 'flex',
 							  alignItems: 'center',

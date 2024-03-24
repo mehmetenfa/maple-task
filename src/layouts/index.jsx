@@ -2,7 +2,6 @@ import React, {useState} from "react";
 import Box from '@mui/material/Box';
 import Sidebar from './sidebar/index';
 import Navbar from "./navbar/index.jsx";
-import {NavLink} from "react-router-dom";
 
 import Tasks from "../pages/tasks/index.jsx";
 import Checklist from "../pages/checklist/index.jsx";
@@ -44,8 +43,17 @@ export default function MainLayout() {
 	   <Box component='section' sx={{display: 'flex', height: '100vh', width: '100vw'}}>
 		  <Sidebar onComponentChange={setSelectedComponent}/>
 		  <Box component='div'>
-			 <Navbar handleAddZone={handleAddZone}/>
-			 {Component && <Component showZone={showZone} zonesCount={zonesCount} handleDeleteZone={handleDeleteZone}/>}
+			 <Navbar
+				 handleAddZone={handleAddZone}
+				 selectedPage={selectedComponent}
+			 />
+			 {Component &&
+				 <Component
+					 showZone={showZone}
+					 zonesCount={zonesCount}
+					 handleDeleteZone={handleDeleteZone}
+				 />
+			 }
 		  </Box>
 	   </Box>
    )
